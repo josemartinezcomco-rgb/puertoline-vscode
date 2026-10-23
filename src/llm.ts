@@ -85,6 +85,13 @@ export async function streamChat(
     const lines = model.api === 'ollama' ? ollamaRequest(model, messages, tools, ctrl.signal, opts) : openaiRequest(model, messages, tools, ctrl.signal);
     const result = model.api === 'ollama' ? await parseOllama(lines, handlers, () => arm(opts.idleMs, 'el stream se detuvo')) : await parseOpenAI(lines, handlers, () => arm(opts.idleMs, 'el stream se detuvo'));
     result.toolCalls = result.toolCalls.filter((c) => c.function.name).map((c) => ({ ...c, id: newCallId() }));
+    if (!result.toolCalls.length) {
+      const recovered = recoverTextToolCall(result.content, new Set(tools.map((t) => t.function.name)));
+      if (recovered) {
+        result.content = recovered.before;
+        result.toolCalls = [{ id: newCallId(), type: 'function', function: recovered.call }];
+      }
+    }
     return result;
   } catch (e) {
     if (timedOut && !signal.aborted) throw new TimeoutError(timedOut);
@@ -93,6 +100,54 @@ export async function streamChat(
     clearTimeout(timer);
     signal.removeEventListener('abort', onUserAbort);
   }
+}
+
+/** Yields every top-level {...} JSON object embedded in free text, with its start offset. */
+function* jsonObjects(text: string): Generator<{ value: any; start: number }> {
+  for (let start = text.indexOf('{'); start >= 0; start = text.indexOf('{', start + 1)) {
+    let depth = 0;
+    let inString = false;
+    for (let i = start; i < text.length; i++) {
+      const ch = text[i];
+      if (inString) {
+        if (ch === '\\') i++;
+        else if (ch === '"') inString = false;
+      } else if (ch === '"') inString = true;
+      else if (ch === '{') depth++;
+      else if (ch === '}' && --depth === 0) {
+        try {
+          yield { value: JSON.parse(text.slice(start, i + 1)), start };
+          start = i;
+        } catch {
+          /* not JSON, keep scanning */
+        }
+        break;
+      }
+    }
+  }
+}
+
+/**
+ * Small local models often write the tool call as JSON text (sometimes inside ```json or <tool_call>)
+ * instead of using native tool calling. Recover only the FIRST call: whatever follows is usually the
+ * model guessing at results it hasn't seen yet.
+ */
+function recoverTextToolCall(
+  content: string,
+  toolNames: Set<string>
+): { before: string; call: { name: string; arguments: string } } | undefined {
+  for (const { value, start } of jsonObjects(content)) {
+    const name = value?.name ?? value?.function?.name ?? value?.tool;
+    if (typeof name !== 'string' || !toolNames.has(name)) continue;
+    const args = value.arguments ?? value.parameters ?? value.function?.arguments ?? value.args ?? {};
+    const before = content
+      .slice(0, start)
+      .replace(/```(json)?\s*$/i, '')
+      .replace(/<tool_call>\s*$/i, '')
+      .trim();
+    return { before, call: { name, arguments: typeof args === 'string' ? args : JSON.stringify(args) } };
+  }
+  return undefined;
 }
 
 async function checkResponse(res: Response): Promise<ReadableStream<Uint8Array>> {

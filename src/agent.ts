@@ -14,6 +14,7 @@ export type UiEvent =
   | { type: 'toolResult'; id: string; result: string; error: boolean }
   | { type: 'model'; id: string }
   | { type: 'discard' }
+  | { type: 'finalText'; text: string }
   | { type: 'notice'; message: string }
   | { type: 'done' }
   | { type: 'error'; message: string };
@@ -127,6 +128,8 @@ export class Agent {
           }
         );
 
+        // The streamed text may have contained a tool call written as text that we recovered; show the cleaned version.
+        emit({ type: 'finalText', text: result.content });
         this.history.push({
           role: 'assistant',
           content: result.content || null,

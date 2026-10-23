@@ -2,7 +2,7 @@
   "name": "puertoline",
   "displayName": "Puertoline",
   "description": "Agente de IA en VS Code para programación, diseño, marketing digital y creación de contenido: edita tu proyecto, usa skills expertas, se integra por MCP/APIs y funciona gratis con Ollama y respaldo automático entre modelos.",
-  "version": "0.4.0",
+  "version": "0.4.2",
   "publisher": "josemartinez",
   "license": "MIT",
   "engines": {
@@ -41,7 +41,7 @@
       },
       {
         "command": "puertoline.newChat",
-        "title": "Puertoline: Nueva conversaciÃ³n",
+        "title": "Puertoline: Nueva conversación",
         "icon": "$(add)"
       },
       {
@@ -55,7 +55,7 @@
       },
       {
         "command": "puertoline.mcpConfig",
-        "title": "Puertoline: Editar configuraciÃ³n MCP (.mcp.json)"
+        "title": "Puertoline: Editar configuración MCP (.mcp.json)"
       },
       {
         "command": "puertoline.mcpReload",
@@ -67,7 +67,7 @@
       },
       {
         "command": "puertoline.addModel",
-        "title": "Puertoline: AÃ±adir modelo"
+        "title": "Puertoline: Añadir modelo"
       },
       {
         "command": "puertoline.pullOllama",
@@ -104,7 +104,7 @@
         "puertoline.models": {
           "type": "array",
           "order": 0,
-          "markdownDescription": "**Cadena de modelos, en orden de preferencia.** Si un modelo falla (lÃ­mite de uso, caÃ­da, timeout, no soporta herramientasâ€¦) el agente pasa al siguiente sin interrumpir la tarea, y vuelve al principal cuando se recupera. Las entradas cuyo proveedor necesita API key y no la tiene se omiten.\n\n`model: \"*\"` = todos los modelos instalados (Ollama) Â· `\"*free*\"` = todos los gratuitos con herramientas (OpenRouter).\n\nProveedores: `ollama`, `openrouter`, `gemini`, `groq`, `cerebras`, `mistral`, `github`, `deepseek`, `custom` (requiere `baseUrl`).",
+          "markdownDescription": "**Cadena de modelos, en orden de preferencia.** Si un modelo falla (límite de uso, caída, timeout, no soporta herramientas…) el agente pasa al siguiente sin interrumpir la tarea, y vuelve al principal cuando se recupera. Las entradas cuyo proveedor necesita API key y no la tiene se omiten.\n\n`model: \"*\"` = todos los modelos instalados (Ollama) · `\"*free*\"` = todos los gratuitos con herramientas (OpenRouter).\n\nProveedores: `ollama`, `openrouter`, `gemini`, `groq`, `cerebras`, `mistral`, `github`, `deepseek`, `custom` (requiere `baseUrl`).",
           "default": [
             {
               "provider": "ollama",
@@ -185,37 +185,37 @@
         "puertoline.localTimeoutSeconds": {
           "type": "number",
           "default": 300,
-          "description": "Igual para Ollama (mÃ¡s alto: cargar el modelo en memoria puede tardar)."
+          "description": "Igual para Ollama (más alto: cargar el modelo en memoria puede tardar)."
         },
         "puertoline.ollamaContextLength": {
           "type": "number",
           "default": 32768,
-          "description": "Ventana de contexto (num_ctx) para Ollama. Ollama usa un valor pequeÃ±o por defecto que corta conversaciones de agente; bÃ¡jalo si tu equipo se queda sin memoria."
+          "description": "Ventana de contexto (num_ctx) para Ollama. Ollama usa un valor pequeño por defecto que corta conversaciones de agente; bájalo si tu equipo se queda sin memoria."
         },
         "puertoline.autoApproveEdits": {
           "type": "boolean",
           "default": false,
-          "description": "Aplicar cambios a archivos sin pedir confirmaciÃ³n."
+          "description": "Aplicar cambios a archivos sin pedir confirmación."
         },
         "puertoline.autoApproveCommands": {
           "type": "boolean",
           "default": false,
-          "description": "Ejecutar comandos de terminal sin pedir confirmaciÃ³n (Â¡cuidado!)."
+          "description": "Ejecutar comandos de terminal sin pedir confirmación (¡cuidado!)."
         },
         "puertoline.autoApproveMcp": {
           "type": "boolean",
           "default": false,
-          "description": "Ejecutar herramientas de servidores MCP sin pedir confirmaciÃ³n (tambiÃ©n se puede marcar cada servidor con \"trust\": true)."
+          "description": "Ejecutar herramientas de servidores MCP sin pedir confirmación (también se puede marcar cada servidor con \"trust\": true)."
         },
         "puertoline.autoApproveHttp": {
           "type": "boolean",
           "default": false,
-          "description": "Permitir peticiones HTTP (http_request) sin pedir confirmaciÃ³n."
+          "description": "Permitir peticiones HTTP (http_request) sin pedir confirmación."
         },
         "puertoline.mcpServers": {
           "type": "object",
           "default": {},
-          "markdownDescription": "Servidores MCP globales (para todos los proyectos). Mismo formato que `.mcp.json` de Claude Code:\n```json\n\"github\": { \"command\": \"npx\", \"args\": [\"-y\", \"@modelcontextprotocol/server-github\"], \"env\": { \"GITHUB_TOKEN\": \"${env:GITHUB_TOKEN}\" } },\n\"remoto\": { \"type\": \"http\", \"url\": \"https://.../mcp\", \"headers\": { \"Authorization\": \"Bearer ...\" } }\n```\nTambiÃ©n se leen `.mcp.json` y `.vscode/mcp.json` del proyecto.",
+          "markdownDescription": "Servidores MCP globales (para todos los proyectos). Mismo formato que `.mcp.json` de Claude Code:\n```json\n\"github\": { \"command\": \"npx\", \"args\": [\"-y\", \"@modelcontextprotocol/server-github\"], \"env\": { \"GITHUB_TOKEN\": \"${env:GITHUB_TOKEN}\" } },\n\"remoto\": { \"type\": \"http\", \"url\": \"https://.../mcp\", \"headers\": { \"Authorization\": \"Bearer ...\" } }\n```\nTambién se leen `.mcp.json` y `.vscode/mcp.json` del proyecto.",
           "additionalProperties": {
             "type": "object",
             "properties": {
@@ -256,7 +256,7 @@
               },
               "trust": {
                 "type": "boolean",
-                "description": "No pedir confirmaciÃ³n para sus herramientas"
+                "description": "No pedir confirmación para sus herramientas"
               },
               "disabled": {
                 "type": "boolean"
@@ -267,12 +267,12 @@
         "puertoline.maxSteps": {
           "type": "number",
           "default": 40,
-          "description": "MÃ¡ximo de pasos (llamadas a herramientas) por mensaje."
+          "description": "Máximo de pasos (llamadas a herramientas) por mensaje."
         },
         "puertoline.commandTimeoutSeconds": {
           "type": "number",
           "default": 120,
-          "description": "Tiempo mÃ¡ximo de ejecuciÃ³n de un comando."
+          "description": "Tiempo máximo de ejecución de un comando."
         },
         "puertoline.disabledSkills": {
           "type": "array",
@@ -327,5 +327,12 @@
   "homepage": "https://github.com/josemartinezcomco-rgb/puertoline-vscode#readme",
   "bugs": {
     "url": "https://github.com/josemartinezcomco-rgb/puertoline-vscode/issues"
+  },
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "Puertoline puede editar archivos y ejecutar comandos en el proyecto, por eso solo funciona en carpetas de confianza. Pulsa \"Manage\" en la barra de Modo restringido y elige \"Trust\"."
+    },
+    "virtualWorkspaces": false
   }
 }

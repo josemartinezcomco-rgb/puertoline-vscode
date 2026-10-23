@@ -171,6 +171,13 @@
           current = null;
         }
         break;
+      case 'finalText':
+        if (current && current.text !== m.text) {
+          current.text = m.text;
+          if (m.text.trim()) current.el.innerHTML = markdown(m.text);
+          else current.el.remove();
+        }
+        break;
       case 'notice':
         add('notice', esc(m.message));
         break;
