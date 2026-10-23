@@ -210,7 +210,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const proposed = new ProposedContent();
   const output = vscode.window.createOutputChannel('Puertoline');
   const mcp = new McpManager(output);
-  const router = new ModelRouter(context.secrets, (m) => output.appendLine(m));
+  const router = new ModelRouter(context.secrets, (m) => output.appendLine(m), context.globalState);
   const skills = new SkillRegistry(vscode.Uri.joinPath(context.extensionUri, 'skills').fsPath);
   const provider = new ChatViewProvider(context, proposed, mcp, router, skills);
 

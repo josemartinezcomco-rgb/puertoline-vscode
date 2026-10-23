@@ -2,7 +2,7 @@
   "name": "puertoline",
   "displayName": "Puertoline",
   "description": "Agente de IA en VS Code para programación, diseño, marketing digital y creación de contenido: edita tu proyecto, usa skills expertas, se integra por MCP/APIs y funciona gratis con Ollama y respaldo automático entre modelos.",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "publisher": "josemartinez",
   "license": "MIT",
   "engines": {

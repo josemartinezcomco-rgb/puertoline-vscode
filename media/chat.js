@@ -76,11 +76,31 @@
     return el;
   }
 
+  // Live "Trabajando con X… 12 s" so a slow model never looks frozen.
+  let activeModel = '';
+  let stepStart = 0;
+  let waitingApproval = false;
+  let ticker = null;
+  function renderStatus() {
+    if (!busy || waitingApproval) return;
+    const secs = Math.round((Date.now() - stepStart) / 1000);
+    status.textContent = `${activeModel ? `Trabajando con ${activeModel}` : 'Trabajando'}… ${secs} s`;
+  }
+
   function setBusy(b) {
     busy = b;
     sendBtn.hidden = b;
     stopBtn.hidden = !b;
-    status.textContent = b ? 'Trabajando…' : '';
+    clearInterval(ticker);
+    waitingApproval = false;
+    if (b) {
+      stepStart = Date.now();
+      activeModel = '';
+      ticker = setInterval(renderStatus, 1000);
+      renderStatus();
+    } else {
+      status.textContent = '';
+    }
   }
 
   function summarizeArgs(name, raw) {
@@ -161,7 +181,10 @@
       case 'model':
         $('model').textContent = `🤖 ${m.id.split('/').slice(1).join('/')}`;
         $('model').title = `Modelo actual: ${m.id}. Pulsa para ver la cadena de respaldo.`;
-        status.textContent = `Trabajando con ${m.id}…`;
+        activeModel = m.id.split('/').slice(1).join('/');
+        stepStart = Date.now();
+        waitingApproval = false;
+        renderStatus();
         break;
       case 'discard':
         // The model failed mid-answer: drop its partial output, the next model redoes the step.
@@ -231,11 +254,14 @@
           b.addEventListener('click', () => {
             const ok = b.dataset.ok === '1';
             vscode.postMessage({ type: 'approval', id: m.id, ok });
+            waitingApproval = false;
+            stepStart = Date.now();
             el.classList.add('resolved');
             el.insertAdjacentHTML('beforeend', `<div class="verdict">${ok ? '✓ Permitido' : '✕ Rechazado'}</div>`);
           })
         );
-        status.textContent = 'Esperando tu aprobación…';
+        waitingApproval = true;
+        status.textContent = '⏸ Esperando tu aprobación (Permitir / Rechazar)…';
         break;
       }
       case 'error':

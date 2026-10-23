@@ -102,6 +102,8 @@ export interface ResolvedModel {
   apiKey: string;
   api: 'openai' | 'ollama';
   local: boolean;
+  /** Index of the configured entry it came from; the router only reorders within a group. */
+  group: number;
 }
 
 export function secretName(provider: string): string {
@@ -112,7 +114,7 @@ export async function getApiKey(secrets: vscode.SecretStorage, provider: string)
   return secrets.get(secretName(provider));
 }
 
-const WILDCARD_LIMIT = 8;
+const WILDCARD_LIMIT = 12;
 const listCache = new Map<string, { at: number; models: string[] }>();
 
 /** Lists models a provider offers. For OpenRouter, only tool-capable ones (and only free ones when freeOnly). */
@@ -166,7 +168,7 @@ export async function resolveChain(
   const out: ResolvedModel[] = [];
   const seen = new Set<string>();
 
-  for (const entry of entries) {
+  for (const [group, entry] of entries.entries()) {
     if (entry.disabled) continue;
     const preset = PROVIDERS[entry.provider];
     if (!preset) {
@@ -194,7 +196,7 @@ export async function resolveChain(
       const id = `${entry.provider}/${model}`;
       if (seen.has(id)) continue;
       seen.add(id);
-      out.push({ id, provider: entry.provider, model, baseUrl, apiKey, api: preset.api, local: entry.provider === 'ollama' });
+      out.push({ id, provider: entry.provider, model, baseUrl, apiKey, api: preset.api, local: entry.provider === 'ollama', group });
     }
   }
   return out;
